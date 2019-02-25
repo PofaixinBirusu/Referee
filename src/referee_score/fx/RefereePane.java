@@ -15,6 +15,7 @@ public class RefereePane extends Pane{
 	private Label refereeTag;
 	
 	private int score;
+	private boolean isReady;
 	
 	public RefereePane(double width, double height, int refereeNum) {
 		setStyle("-fx-background-colod:rgb(30, 26, 22);");
@@ -61,7 +62,7 @@ public class RefereePane extends Pane{
 		this.score = score;
 		int score_1 = score / 100;
 		int score_2 = score / 10 % 10;
-		int score_3  =score % 10;
+		int score_3 = score % 10;
 		scores[0].setText(score_1 + "");
 		scores[1].setText(score_2 + "");
 		scores[2].setText(score_3 + "");
@@ -71,5 +72,25 @@ public class RefereePane extends Pane{
 		Platform.runLater(() -> {
 			setScore(score - deduction);
 	    });
+	}
+	
+	public boolean ready() {
+		isReady = !isReady;
+		return isReady;
+	}
+	
+	public void refereeInit() {
+		Platform.runLater(() -> {
+			isReady = false;
+			setScore(100);
+		});
+	}
+	
+	public boolean getIsReady() {
+		return isReady;
+	}
+	
+	public int getScore() {
+		return score;
 	}
 }

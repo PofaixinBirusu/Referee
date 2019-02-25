@@ -17,6 +17,7 @@ public class SocketSolve implements Runnable{
 	private Board board;
 	
 	private final String DEDUCTION_ORDER = "deduction";
+	private final String REFEREE_READY_ORDER = "ready";
 	private final String DEDUCTION_SPLIT = ":";
 	
 	public SocketSolve(Socket socket, int refereeNum, Board board) {
@@ -62,8 +63,12 @@ public class SocketSolve implements Runnable{
 	
 	private void dealInstruction(String instruction) {
 		if (instruction.startsWith(DEDUCTION_ORDER)) {
+			// 扣分指令
 			int deduction = Integer.parseInt(instruction.split(DEDUCTION_SPLIT)[1]);
 			board.refereePointsDeduction(refereeNum, deduction);
+		} else if (instruction.startsWith(REFEREE_READY_ORDER)) {
+			// 裁判“准备”指令
+			board.refereeReady(refereeNum);
 		}
 	}
 	
