@@ -20,6 +20,7 @@ public class DeductionButton extends Pane{
 	private double width;
 	private double height;
 	private double score;
+	private client client;
 	
 	public DeductionButton(double score, double width, double height ,int flag){
 		this.score = score;
@@ -29,6 +30,10 @@ public class DeductionButton extends Pane{
 		setPrefHeight(height);
 //		setStyle("-fx-background-color:gray");
 		setComponent(flag);
+	}
+	
+	public void setClient(client client) {
+		this.client = client;
 	}
 	
 	private void setComponent(int flag){
@@ -43,6 +48,7 @@ public class DeductionButton extends Pane{
 		});
 		view.setOnMouseReleased(e->{
 			view.setImage(image1);
+			client.deductionScore(-score);
 		});
 		Pane pane = new Pane();
 		pane.setStyle("-fx-border-color: #E16821;-fx-border-width:0px 0px 5px 5px");

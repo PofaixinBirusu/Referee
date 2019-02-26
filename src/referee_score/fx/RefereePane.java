@@ -51,6 +51,7 @@ public class RefereePane extends Pane{
 	}
 	
 	public void show() {
+		refereeInit();
 		this.setOpacity(1);
 	}
 	

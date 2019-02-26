@@ -1,5 +1,13 @@
 package referee_score.tcp.client;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.text.DecimalFormat;
+import java.util.Scanner;
+
 import com.sun.prism.paint.Color;
 
 import javafx.application.Application;
@@ -32,6 +40,11 @@ public class client extends Application{
 	private final int SCREEN_WIDTH;
 	private final int SCREEN_HEIGHT;
 	
+	private RefereeSocket refereeSocket;
+	
+	private String ip = "127.0.0.1";
+	private int port = 8866;
+	
 	public client(){
 		Screen screen = Screen.getPrimary();
 		Rectangle2D bounds = screen.getVisualBounds();
@@ -39,6 +52,13 @@ public class client extends Application{
 		this.LEFT_TOP_Y = (int) bounds.getMinY();
 		this.SCREEN_WIDTH = (int)bounds.getWidth();
 		this.SCREEN_HEIGHT = (int)bounds.getHeight();
+		refereeSocket = new RefereeSocket(ip, port);
+		
+		new Thread(){
+			public void run() {
+				refereeSocket.connect();
+			}
+		}.start();
 	}
 
 	@Override
@@ -85,8 +105,12 @@ public class client extends Application{
 //		ImageView view = new ImageView(image);
 		DeductionButton button1 = new DeductionButton(-5, 180, 120, 0);
 		DeductionButton button2 = new DeductionButton(-3, 180, 120, 0);
-		DeductionButton button3 = new DeductionButton(-1, 180, 120, 1);
-		DeductionButton button4 = new DeductionButton(-0.5, 180, 120, 1);
+		DeductionButton button3 = new DeductionButton(-2, 180, 120, 1);
+		DeductionButton button4 = new DeductionButton(-1, 180, 120, 1);
+		button1.setClient(this);
+		button2.setClient(this);
+		button3.setClient(this);
+		button4.setClient(this);
 		HBox box4 = new HBox(SCREEN_WIDTH/2);
 		box4.getChildren().addAll(button1, button3);
 		HBox box5 = new HBox(SCREEN_WIDTH/4 - 36);
@@ -103,6 +127,7 @@ public class client extends Application{
 		});
 		view.setOnMouseReleased(e->{
 			view.setImage(image1);
+			refereeSocket.send("ready");
 		});
 		
 		
@@ -137,6 +162,78 @@ public class client extends Application{
 		stage.setY(LEFT_TOP_Y);
 		stage.setWidth(SCREEN_WIDTH);
 		stage.setHeight(SCREEN_HEIGHT);
+	}
+	
+	public void deductionScore(double deduction) {
+		String formatStrScore = new DecimalFormat("0.0").format(deduction);
+		if (Math.abs(deduction - (int)deduction) < 1e-8) {
+			formatStrScore = Integer.toString((int)deduction);
+		}
+		refereeSocket.send("deduction:" + formatStrScore);
+		System.out.println("fuck wdd");
+	}
+	
+	class RefereeSocket {
+		
+		private String ipAddress;
+		private int port;
+		
+		private DataOutputStream dataOutput;
+		private DataInputStream dataInput;
+		private Socket socket;
+		private boolean bConnected = false;
+		
+		public RefereeSocket (String ip, int port) {
+			ipAddress = ip;
+			this.port = port;
+		}
+		
+		public void connect() {
+			try {
+				socket = new Socket(ipAddress, port);
+				dataOutput = new DataOutputStream(socket.getOutputStream());
+				dataInput = new DataInputStream(socket.getInputStream());
+				bConnected = true;
+				
+				String str = dataInput.readUTF();
+				System.out.println("server sad:" + str);
+				
+				while (bConnected) {
+					
+				}
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				close ();
+			}
+		}
+		
+		private void close () {
+			bConnected = false;
+			if (socket != null) {
+				try {
+					socket.close();
+					socket = null;
+					dataOutput.close();
+					dataOutput = null;
+					dataInput.close();
+					dataInput = null;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		public void send(String str) {
+			try {
+				dataOutput.writeUTF(str);
+				dataOutput.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public static void main(String[] args) {
