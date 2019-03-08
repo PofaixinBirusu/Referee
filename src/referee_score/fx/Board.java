@@ -21,7 +21,7 @@ public class Board extends Application {
 	private final int SCREEN_WIDTH;
 	private final int SCREEN_HEIGHT;
 	
-	private int refereeCount = 1;
+	private int refereeCount = 2;
 	private double refreeHeightSplit;
 	private RefereePane[] referees;
 	private int currentRefereeCount;
@@ -105,6 +105,9 @@ public class Board extends Application {
 	
 	
 	public void refereeIsOut(int refereeNum) {
+		if (referees[refereeNum].getIsReady()) {
+			refereeReadyCount --;
+		}
 		referees[refereeNum].hide();
 		isRefereeCome[refereeNum] = false;
 		currentRefereeCount --;
@@ -118,7 +121,7 @@ public class Board extends Application {
 	public synchronized void refereePointsDeduction(int refereeNum, int deduction) {
 		referees[refereeNum].pointsDeduction(deduction);
 		sumScore -= deduction;
-		avgScorePane.setAvgScore(sumScore / refereeCount);
+		avgScorePane.setAvgScore((double)sumScore / refereeCount);
 	}
 	
 	public synchronized void refereeReady(int refereeNum) {

@@ -1,13 +1,17 @@
 package referee_score.tcp.server;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import referee_score.fx.Board;
+import referee_score.utils.ContestManager;
 
 public class BoardServer implements Runnable{
 	
@@ -31,11 +35,17 @@ public class BoardServer implements Runnable{
 				Map<String, Integer> refereeComeInResult = board.refereeIsComeIn();
 				if (refereeComeInResult.get(board.REFEREE_COME_SUCCESS_KEY) == 1) {
 					// 裁判连接成功
+					ContestManager.shareInstance().addSocket(socket);
 					int refereeNum = refereeComeInResult.get(board.REFEREE_COME_NUMBER_KEY);
 					threadPool.execute(new SocketSolve(socket, refereeNum, board));
 				} else {
+					String []refereeComeinFaildMsg = {"裁判人数已达到最大，无法加入"};
 					// 裁判连接失败
-					
+					DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
+					dataOutput.writeUTF(
+						refereeComeinFaildMsg[
+						    refereeComeInResult.get(board.REFEREE_COME_FAILD_MSG_KEY)]
+					);
 				}
 			} 
 		} catch (Exception e) {

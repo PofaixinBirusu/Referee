@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import referee_score.fx.Board;
+import referee_score.utils.ContestManager;
 
 public class SocketSolve implements Runnable{
 	
@@ -56,6 +57,7 @@ public class SocketSolve implements Runnable{
 				socket.close();
 			}
 			board.refereeIsOut(refereeNum);
+			ContestManager.shareInstance().removeSocket(socket);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -63,9 +65,11 @@ public class SocketSolve implements Runnable{
 	
 	private void dealInstruction(String instruction) {
 		if (instruction.startsWith(DEDUCTION_ORDER)) {
-			// 扣分指令
-			int deduction = Integer.parseInt(instruction.split(DEDUCTION_SPLIT)[1]);
-			board.refereePointsDeduction(refereeNum, deduction);
+			if (ContestManager.shareInstance().getTestState() == ContestManager.TESTING) {
+				// 扣分指令
+				int deduction = Integer.parseInt(instruction.split(DEDUCTION_SPLIT)[1]);
+				board.refereePointsDeduction(refereeNum, deduction);
+			}
 		} else if (instruction.startsWith(REFEREE_READY_ORDER)) {
 			// 裁判“准备”指令
 			board.refereeReady(refereeNum);

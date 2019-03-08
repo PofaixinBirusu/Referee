@@ -13,15 +13,19 @@ public class RefereePane extends Pane{
 
 	private Label[] scores;
 	private Label refereeTag;
+	private Label readyTag;
 	
 	private int score;
 	private boolean isReady;
+	
+	private final String READY_TAG = "已准备";
 	
 	public RefereePane(double width, double height, int refereeNum) {
 		setStyle("-fx-background-colod:rgb(30, 26, 22);");
 		this.height = height;
 		this.width = width;
 		this.refereeTag = new Label(refereeNum + "#考官");
+		this.readyTag = new Label(READY_TAG);
 		this.scores = new Label[3];
 		for (int i=0;i<3;i++) {
 			scores[i] = new Label("100".charAt(i)+"");
@@ -34,6 +38,13 @@ public class RefereePane extends Pane{
 	
 	private void setComponent() {
 		this.getChildren().add(refereeTag);
+		
+		readyTag.setFont(Font.font ("FZCuYuan", this.height / 8));
+		readyTag.setStyle("-fx-font-weight: bold;");
+		readyTag.setTranslateX(this.width - 30);
+		readyTag.setTranslateY(this.height / 8 * 1.5);
+		readyTag.setTextFill(Color.WHITE);
+		
 		refereeTag.setFont(Font.font ("FZCuYuan", this.height / 8));
 		refereeTag.setStyle("-fx-font-weight: bold;");
 		refereeTag.setTranslateX(this.width / 5 * 2);
